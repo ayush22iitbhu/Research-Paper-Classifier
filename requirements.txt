@@ -1,0 +1,6 @@
+torch
+sentence-transformers>=3.0.0
+faiss-cpu
+rank-bm25
+scikit-learn
+numpy
