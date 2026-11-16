@@ -3,7 +3,10 @@ import torch
 from sentence_transformers import util
 from src.data import ArtifactLoader
 
+
 class DualTierClassifier:
+    """Dual-tier extreme multi-label classifier (Supervised MLP Head + Zero-Shot Semantic Tail)."""
+
     def __init__(self, loader: ArtifactLoader):
         self.loader = loader
         self.cfg = loader.cfg
@@ -20,23 +23,27 @@ class DualTierClassifier:
         probs = torch.sigmoid(logits).squeeze()
         for idx in (probs >= self.cfg.MLP_THRESHOLD).nonzero(as_tuple=True)[0]:
             code = self.loader.mlb.classes_[idx.item()]
-            predictions.append({
-                "code": code,
-                "name": self.loader.taxonomy.get(code, code),
-                "conf": f"{probs[idx].item() * 100:.1f}%",
-                "tier": "Head (Supervised)"
-            })
+            predictions.append(
+                {
+                    "code": code,
+                    "name": self.loader.taxonomy.get(code, code),
+                    "conf": f"{probs[idx].item() * 100:.1f}%",
+                    "tier": "Head (Supervised)",
+                }
+            )
 
-        # Tail Branch (Zero-Shot Semantic Match)
+        # Tail Branch (Zero-Shot Cosine Similarity)
         tail_scores = util.cos_sim(abstract_emb, self.loader.rare_embeddings)[0]
         for idx in (tail_scores >= self.cfg.TAIL_THRESHOLD).nonzero(as_tuple=True)[0]:
             code = self.loader.rare_codes[idx.item()]
-            predictions.append({
-                "code": code,
-                "name": self.loader.rare_descriptions[idx.item()],
-                "conf": f"{tail_scores[idx].item() * 100:.1f}%",
-                "tier": "Tail (Zero-Shot)"
-            })
+            predictions.append(
+                {
+                    "code": code,
+                    "name": self.loader.rare_descriptions[idx.item()],
+                    "conf": f"{tail_scores[idx].item() * 100:.1f}%",
+                    "tier": "Tail (Zero-Shot)",
+                }
+            )
 
         predictions.sort(key=lambda x: float(x["conf"].replace("%", "")), reverse=True)
         return predictions

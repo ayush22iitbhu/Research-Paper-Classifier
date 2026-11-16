@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class ProductionMLP(nn.Module):
     def __init__(self, input_dim: int = 384, num_classes: int = 50):
         super().__init__()
@@ -11,7 +12,7 @@ class ProductionMLP(nn.Module):
             nn.Linear(256, 128),
             nn.ReLU(),
             nn.Dropout(0.4),
-            nn.Linear(128, num_classes)
+            nn.Linear(128, num_classes),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

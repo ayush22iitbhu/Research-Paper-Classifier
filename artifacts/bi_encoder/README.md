@@ -271,17 +271,10 @@ print(embeddings.shape)
 # Get the similarity scores for the embeddings
 similarities = model.similarity(embeddings, embeddings)
 print(similarities)
-# tensor([[1.0000, 0.6844, 0.0525],
-#         [0.6844, 1.0000, 0.0430],
-#         [0.0525, 0.0430, 1.0000]])
+# tensor([[1.0000, 0.6849, 0.0723],
+#         [0.6849, 1.0000, 0.0569],
+#         [0.0723, 0.0569, 1.0000]])
 ```
-<!--
-### Direct Usage (Transformers)
-
-<details><summary>Click to see the direct usage in Transformers</summary>
-
-</details>
--->
 
 <!--
 ### Downstream Usage (Sentence Transformers)
@@ -459,6 +452,8 @@ You can finetune this model on your own dataset.
 - `multi_dataset_batch_sampler`: proportional
 - `router_mapping`: {}
 - `learning_rate_mapping`: {}
+- `activation_checkpointing`: False
+- `activation_checkpointing_kwargs`: None
 - `warmup_ratio`: None
 
 </details>
@@ -466,44 +461,24 @@ You can finetune this model on your own dataset.
 ### Training Logs
 | Epoch  | Step | Training Loss |
 |:------:|:----:|:-------------:|
-| 0.0389 | 50   | 0.0930        |
-| 0.0778 | 100  | 0.0508        |
-| 0.1167 | 150  | 0.0571        |
-| 0.1556 | 200  | 0.0425        |
-| 0.1946 | 250  | 0.0281        |
-| 0.2335 | 300  | 0.0512        |
-| 0.2724 | 350  | 0.0393        |
-| 0.3113 | 400  | 0.0320        |
-| 0.3502 | 450  | 0.0344        |
-| 0.3891 | 500  | 0.0408        |
-| 0.4280 | 550  | 0.0460        |
-| 0.4669 | 600  | 0.0292        |
-| 0.5058 | 650  | 0.0379        |
-| 0.5447 | 700  | 0.0341        |
-| 0.5837 | 750  | 0.0300        |
-| 0.6226 | 800  | 0.0317        |
-| 0.6615 | 850  | 0.0346        |
-| 0.7004 | 900  | 0.0350        |
-| 0.7393 | 950  | 0.0270        |
-| 0.7782 | 1000 | 0.0356        |
-| 0.8171 | 1050 | 0.0281        |
-| 0.8560 | 1100 | 0.0331        |
-| 0.8949 | 1150 | 0.0311        |
-| 0.9339 | 1200 | 0.0402        |
-| 0.9728 | 1250 | 0.0307        |
+| 0.1946 | 250  | 0.0540        |
+| 0.3891 | 500  | 0.0396        |
+| 0.5837 | 750  | 0.0377        |
+| 0.7782 | 1000 | 0.0307        |
+| 0.9728 | 1250 | 0.0322        |
 
 
 ### Training Time
-- **Training**: 2.6 minutes
+- **Training**: 3.5 minutes
 
 ### Framework Versions
-- Python: 3.13.15
-- Sentence Transformers: 6.0.1
-- Transformers: 5.16.1
-- PyTorch: 2.11.0+cu128
-- Accelerate: 1.14.0
-- Datasets: 5.0.1
-- Tokenizers: 0.23.1
+- Python: 3.13.16
+- Sentence Transformers: 6.3.0
+- Transformers: 5.22.1
+- PyTorch: 2.14.1+cu130
+- Accelerate: 1.15.0
+- Datasets: 5.2.0
+- Tokenizers: 0.23.3
 
 ## Additional Resources
 

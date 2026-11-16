@@ -4,7 +4,10 @@ import numpy as np
 import torch
 from src.data import ArtifactLoader
 
+
 class HybridSearchEngine:
+    """Two-stage hybrid retrieval engine combining FAISS, BM25, RRF, and Cross-Encoder reranking."""
+
     def __init__(self, loader: ArtifactLoader):
         self.loader = loader
         self.cfg = loader.cfg
@@ -14,20 +17,20 @@ class HybridSearchEngine:
         pool_size = self.cfg.POOL_SIZE
         rrf_k = self.cfg.RRF_K
 
-        # Dense Search (FAISS)
+        # Dense Search (FAISS HNSW)
         q_emb = self.loader.st_model.encode([title], normalize_embeddings=True, convert_to_numpy=True)
         _, faiss_ids = self.loader.faiss_index.search(
             np.ascontiguousarray(q_emb, dtype=np.float32), pool_size
         )
         dense_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(faiss_ids[0])}
 
-        # Sparse Search (BM25)
+        # Sparse Lexical Search (BM25)
         tokens = title.lower().split()
         bm25_scores = self.loader.bm25.get_scores(tokens)
         sparse_ids = np.argsort(bm25_scores)[::-1][:pool_size]
         sparse_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(sparse_ids)}
 
-        # RRF Fusion
+        # Reciprocal Rank Fusion (RRF)
         candidate_ids = set(dense_ranks.keys()).union(set(sparse_ranks.keys()))
         rrf_scores = defaultdict(float)
         for doc_id in candidate_ids:
@@ -39,7 +42,7 @@ class HybridSearchEngine:
         sorted_pool = sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)[:pool_size]
         pool_ids = [doc_id for doc_id, _ in sorted_pool]
 
-        # Cross-Encoder Reranking
+        # Cross-Encoder Sequence Reranking
         pairs = [[title, self.loader.corpus_titles[cid]] for cid in pool_ids]
         scores = self.loader.cross_encoder.predict(pairs)
         ranked = sorted(zip(pool_ids, scores), key=lambda x: x[1], reverse=True)
@@ -50,4 +53,5 @@ class HybridSearchEngine:
                 results.append((self.loader.corpus_titles[cid], float(score)))
             if len(results) == top_k:
                 break
+
         return results
