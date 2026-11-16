@@ -1,3 +1,7 @@
+# Research Paper Classifier
+It classifies scientific research papers into academic categories and retrieves semantically relevant papers using contrastive learning, multi-label classification, hybrid BM25–FAISS search, and cross-encoder reranking. 
+[Google Colab](https://colab.research.google.com/drive/1wr-WZDou0-7SPTISn5Jq3I3isemWcrzy)
+
 ### Key Components
 
 1. **Domain-Adaptive Contrastive Alignment (`MNRL`):**
